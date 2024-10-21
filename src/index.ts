@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { initDb } from './store/userDb';
 import worker from './worker';
+import loadBalancer from './loadBalancer';
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ const db = initDb();
 const isMulti = process.argv.includes('--multi');
 
 if (isMulti) {
-  console.log('start in multi-instance mode');
+  loadBalancer(PORT, db);
 } else {
   worker(PORT, db);
 }

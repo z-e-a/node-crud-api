@@ -4,6 +4,7 @@ import { HttpMethods, StatusCodes } from './types/util';
 import { validate as validateUuid } from 'uuid';
 import { IUser } from './types/entity';
 import { getUserFromBody, responseWithNotFound } from './utils';
+import cluster from 'node:cluster';
 
 const worker = async (port: number, db: UserDb) => {
   const server = http.createServer(async (request: http.IncomingMessage, response: http.ServerResponse) => {
@@ -101,6 +102,10 @@ const worker = async (port: number, db: UserDb) => {
             response.setHeader('Content-Type', 'application/json');
             response.end(JSON.stringify({ message: http.STATUS_CODES[status], error: `user id is not valid` }));
           }
+        }
+
+        if (cluster.isWorker) {
+          process.send?.({ data: db.getAllUsers() });
         }
       } else {
         responseWithNotFound(response);
