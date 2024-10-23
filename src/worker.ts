@@ -6,7 +6,7 @@ import { IUser } from './types/entity';
 import { getUserFromBody, responseWithNotFound } from './utils';
 import cluster from 'node:cluster';
 
-const worker = async (port: number, db: UserDb) => {
+const worker = async (port: number, getDb: () => UserDb) => {
   const server = http.createServer(async (request: http.IncomingMessage, response: http.ServerResponse) => {
     try {
       const { url, method } = request;
@@ -14,7 +14,7 @@ const worker = async (port: number, db: UserDb) => {
         const status = StatusCodes.OK;
         response.statusCode = status;
         response.setHeader('Content-Type', 'application/json');
-        response.write(JSON.stringify(db.getAllUsers()));
+        response.write(JSON.stringify(getDb().getAllUsers()));
         response.end();
       } else if (url && url.match(/(^\/api\/user)(.{0,}$)/)) {
         const userIdMatches = url.match(/(^\/api\/user\/)([a-zA-Z0-9-]+)$/) ?? [];
@@ -29,7 +29,7 @@ const worker = async (port: number, db: UserDb) => {
           }
         }
         if (userId && isIdValid) {
-          const userFromDb = db.getUserById(userId);
+          const userFromDb = getDb().getUserById(userId);
           if (userFromDb) {
             switch (method) {
               case HttpMethods.GET: {
@@ -43,12 +43,15 @@ const worker = async (port: number, db: UserDb) => {
               case HttpMethods.PUT: {
                 const userFromBody: IUser = (await getUserFromBody(request)) as IUser;
                 if (userFromBody && userFromBody.username && userFromBody.age && userFromBody.hobbies) {
-                  db.updateUserById(String(userFromDb.id), userFromBody);
+                  getDb().updateUserById(String(userFromDb.id), userFromBody);
                   const status = StatusCodes.OK;
                   response.statusCode = status;
                   response.setHeader('Content-Type', 'application/json');
                   response.end(
-                    JSON.stringify({ message: http.STATUS_CODES[status], data: db.getUserById(String(userFromDb.id)) }),
+                    JSON.stringify({
+                      message: http.STATUS_CODES[status],
+                      data: getDb().getUserById(String(userFromDb.id)),
+                    }),
                   );
                 } else {
                   const status = StatusCodes.BAD_REQUEST;
@@ -64,7 +67,7 @@ const worker = async (port: number, db: UserDb) => {
                 break;
               }
               case HttpMethods.DELETE: {
-                db.deleteUserById(String(userFromDb.id));
+                getDb().deleteUserById(String(userFromDb.id));
                 const status = StatusCodes.NO_CONTENT;
                 response.statusCode = status;
                 response.end();
@@ -84,7 +87,7 @@ const worker = async (port: number, db: UserDb) => {
           if (method === HttpMethods.POST) {
             const userFromBody: IUser = (await getUserFromBody(request)) as IUser;
             if (userFromBody && userFromBody.username && userFromBody.age && userFromBody.hobbies) {
-              const createdUser = db.createUser(userFromBody);
+              const createdUser = getDb().createUser(userFromBody);
               const status = StatusCodes.CREATED;
               response.statusCode = status;
               response.setHeader('Content-Type', 'application/json');
@@ -105,7 +108,7 @@ const worker = async (port: number, db: UserDb) => {
         }
 
         if (cluster.isWorker) {
-          process.send?.({ data: db.getAllUsers() });
+          process.send?.({ data: getDb().getAllUsers() });
         }
       } else {
         responseWithNotFound(response);

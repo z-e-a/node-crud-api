@@ -6,25 +6,15 @@ import { availableParallelism } from 'node:os';
 import { StatusCodes } from './types/util';
 import { IUser } from './types/entity';
 
-const loadBalancer = (initPort: number, db: UserDb) => {
+const loadBalancer = (initPort: number, getDb: () => UserDb, setDb: (newDb: UserDb) => void) => {
   if (cluster.isPrimary) {
     const maxWorkers = availableParallelism() - 1;
     for (let i = 0; i < maxWorkers; i++) {
       const worker = cluster.fork({ WORKER_PORT: initPort + i + 1 });
 
       worker.on('message', (message) => {
-        // console.log(message);
-        // ServiceForUsersBase.updateUsers(message);
-        // cores.map((_, i) => {
-        //   const currentWorker = cluster.workers && cluster.workers[i + 1];
-        //   if (currentWorker) {
-        //     currentWorker.send({ data: ServiceForUsersBase.getUsers() });
-        //   }
-        // });
-        db = new UserDb(message.data);
+        setDb(new UserDb(message.data));
         for (const currentWorker of Object.values(cluster.workers ?? {})) {
-          // currentWorker?.send('big announcement to all workers');
-          // currentWorker?.send({ data: db.getAllUsers() });
           currentWorker?.send(message);
         }
       });
@@ -44,11 +34,9 @@ const loadBalancer = (initPort: number, db: UserDb) => {
               method: incomingRequest.method,
             },
             (proxyResponse) => {
-              // console.log(proxyResponse.headers);
               Object.keys(proxyResponse.headers).forEach((header) => {
                 outgoingResponse.setHeader(header, String(proxyResponse.headers[header]));
               });
-              // outgoingResponse.setHeader(proxyResponse.headers);
               proxyResponse.pipe(outgoingResponse);
             },
           );
@@ -68,21 +56,10 @@ const loadBalancer = (initPort: number, db: UserDb) => {
 
   if (cluster.isWorker) {
     const workerPort = parseInt(process.env.WORKER_PORT ?? String(initPort + 1));
-    worker(workerPort, db);
+    worker(workerPort, getDb);
 
-    // worker.on('message', (message) => {
-    // ServiceForUsersBase.updateUsers(message);
-    // cores.map((_, i) => {
-    //   const currentWorker = cluster.workers && cluster.workers[i + 1];
-    //   if (currentWorker) {
-    //     currentWorker.send({ data: ServiceForUsersBase.getUsers() });
-    //   }
-    // });
     process.on('message', (message: { data: IUser[] }) => {
-      // console.log(message);
-      // console.log(db);
-      db = new UserDb(message.data);
-      // console.log(db);
+      setDb(new UserDb(message.data));
     });
   }
 };

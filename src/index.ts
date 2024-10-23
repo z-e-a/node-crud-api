@@ -1,17 +1,24 @@
 import dotenv from 'dotenv';
-import { initDb } from './store/userDb';
+import { initDb, UserDb } from './store/userDb';
 import worker from './worker';
 import loadBalancer from './loadBalancer';
 
 dotenv.config();
 
 const PORT = parseInt(process.env.PORT as string) || 3000;
-const db = initDb();
+let db = initDb();
+
+const getDb = () => {
+  return db;
+};
+const setDb = (newDb: UserDb) => {
+  db = newDb;
+};
 
 const isMulti = process.argv.includes('--multi');
 
 if (isMulti) {
-  loadBalancer(PORT, db);
+  loadBalancer(PORT, getDb, setDb);
 } else {
-  worker(PORT, db);
+  worker(PORT, getDb);
 }
