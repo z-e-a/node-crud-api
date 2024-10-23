@@ -10,7 +10,9 @@
   "license": "MIT",
   "scripts": {
     "start:dev": "nodemon",
+    "start:multi-dev": "nodemon ./src/index.js --multi",
     "start:prod": "webpack --mode=production && node ./dist/main.js",
+    "start:multi": "webpack --mode=production && node ./dist/main.js --multi",
     "test": "jest",
     "lint": "eslint . --fix"
   },
@@ -19,8 +21,10 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.13",
+    "@types/dotenv": "^6.1.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.7.7",
+    "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
     "@types/webpack": "^5.28.5",
     "@typescript-eslint/eslint-plugin": "^8.10.0",
@@ -34,6 +38,8 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
