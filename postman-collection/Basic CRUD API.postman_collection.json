@@ -46,13 +46,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/user/{{user_id}}",
+					"raw": "{{base_url}}/api/users/{{user_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"users",
 						"{{user_id}}"
 					]
 				}
@@ -65,13 +65,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/user/00000000-0000-0000-0000-000000000000",
+					"raw": "{{base_url}}/api/users/00000000-0000-0000-0000-000000000000",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"users",
 						"00000000-0000-0000-0000-000000000000"
 					]
 				}
@@ -84,13 +84,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/api/user/123",
+					"raw": "{{base_url}}/api/users/123",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"users",
 						"123"
 					]
 				}
@@ -128,13 +128,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/user",
+					"raw": "{{base_url}}/api/users",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user"
+						"users"
 					]
 				},
 				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
@@ -171,13 +171,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/user/{{last_created_user_id}}",
+					"raw": "{{base_url}}/api/users/{{last_created_user_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"users",
 						"{{last_created_user_id}}"
 					]
 				},
@@ -225,13 +225,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/api/user/{{last_created_user_id}}",
+					"raw": "{{base_url}}/api/users/{{last_created_user_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"users",
 						"{{last_created_user_id}}"
 					]
 				},

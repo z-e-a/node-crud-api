@@ -16,8 +16,8 @@ const worker = async (port: number, getDb: () => UserDb) => {
         response.setHeader('Content-Type', 'application/json');
         response.write(JSON.stringify(getDb().getAllUsers()));
         response.end();
-      } else if (url && url.match(/(^\/api\/user)(.{0,}$)/)) {
-        const userIdMatches = url.match(/(^\/api\/user\/)([a-zA-Z0-9-]+)$/) ?? [];
+      } else if (url && url.match(/(^\/api\/users)(.{0,}$)/)) {
+        const userIdMatches = url.match(/(^\/api\/users\/)([a-zA-Z0-9-]+)$/) ?? [];
         let userId = null;
         let isIdValid = false;
         if (userIdMatches.length >= 2) {

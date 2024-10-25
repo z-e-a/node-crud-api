@@ -12,10 +12,10 @@ let db = initDb();
 const getDb = () => {
   return db;
 };
+let shutdownServer: () => void;
+let createdUserId = '';
 
 describe('CRUD tests', () => {
-  let shutdownServer: () => void;
-  let createdUserId = '';
 
   beforeAll(async () => {
     shutdownServer = await worker(PORT, getDb);
@@ -38,7 +38,7 @@ describe('CRUD tests', () => {
       hobbies: ['fishing'],
     };
     const postResponse = await request(`localhost:${PORT}`)
-      .post('/api/user')
+      .post('/api/users')
       .send(newUser)
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
@@ -49,7 +49,7 @@ describe('CRUD tests', () => {
     delete createdUser['id'];
     expect(createdUser).toStrictEqual(newUser);
 
-    const getResponse = await request(`localhost:${PORT}`).get((`/api/user/${createdUserId}`));
+    const getResponse = await request(`localhost:${PORT}`).get((`/api/users/${createdUserId}`));
     expect(getResponse.status).toBe(200);
 
   });
@@ -63,7 +63,7 @@ describe('CRUD tests', () => {
     };
 
     const response = await request(`localhost:${PORT}`)
-      .put(`/api/user/${createdUserId}`)
+      .put(`/api/users/${createdUserId}`)
       .send(newUserData)
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json');
@@ -74,10 +74,10 @@ describe('CRUD tests', () => {
 
   test('Scenario 3: Delete user', async () => {
     const delResponse = await request(`localhost:${PORT}`)
-      .delete(`/api/user/${createdUserId}`);
+      .delete(`/api/users/${createdUserId}`);
     expect(delResponse.status).toBe(204);
 
-    const getResponse = await request(`localhost:${PORT}`).get((`/api/user/${createdUserId}`));
+    const getResponse = await request(`localhost:${PORT}`).get((`/api/users/${createdUserId}`));
     expect(getResponse.status).toBe(404);
   });
 });
